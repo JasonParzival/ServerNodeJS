@@ -3,18 +3,22 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JasonParzival/ServerNodeJS.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Mukhamedzyanoff Ruslan",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/JasonParzival/ServerNodeJS/issues"
   },
   "homepage": "https://github.com/JasonParzival/ServerNodeJS#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
 }
