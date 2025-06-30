@@ -1,14 +1,19 @@
 const http = require("http");
+const url = require('url');
+
 http.createServer(function(request,response){
-     
-    if (request.url === '/') {
+    const parsedUrl = url.parse(request.url, true);
+    const path = parsedUrl.pathname;
+    const query = parsedUrl.query;
+    
+    if (path === '/') {
         response.writeHead(200, {
             "Content-Type": "text/html; charset=utf-8"
         });
 
         response.end("<h1>Привет, Октагон!</h1>");
     }
-    else if (request.url == '/static') {
+    else if (path === '/static') {
         const responsejson = {
             header: "Hello",
             body: "Octagon NodeJS Test"
@@ -18,6 +23,38 @@ http.createServer(function(request,response){
             'Content-Type': 'application/json; charset=utf-8' 
         });
         response.end(JSON.stringify(responsejson));
+    }
+    else if (path === '/dynamic'){
+        const a = parseFloat(query.a);
+        const b = parseFloat(query.b);
+        const c = parseFloat(query.c);
+
+        if (
+            query.a === undefined || query.b === undefined || query.c === undefined ||
+            isNaN(a) || isNaN(b) || isNaN(c)
+        ) {
+            const errorResponse = { 
+                header: "Error" 
+            };
+
+            response.writeHead(404, { 
+                'Content-Type': 'application/json; charset=utf-8' 
+            });
+
+            response.end(JSON.stringify(errorResponse));
+        } else {
+            const result = (a * b * c) / 3;
+
+            const successResponse = {
+                header: "Calculated",
+                body: result.toString()
+            };
+
+            response.writeHead(200, { 
+                'Content-Type': 'application/json; charset=utf-8' 
+            });
+            response.end(JSON.stringify(successResponse));
+        }
     }
     else {
         response.writeHead(404, { 
