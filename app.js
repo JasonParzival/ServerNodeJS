@@ -1,7 +1,8 @@
 const http = require("http");
 const url = require('url');
+const db = require('./db');
 
-http.createServer(function(request,response){
+http.createServer(async function(request,response){
     const parsedUrl = url.parse(request.url, true);
     const path = parsedUrl.pathname;
     const query = parsedUrl.query;
@@ -54,6 +55,23 @@ http.createServer(function(request,response){
                 'Content-Type': 'application/json; charset=utf-8' 
             });
             response.end(JSON.stringify(successResponse));
+        }
+    }
+    if (path === '/getAllItems' && request.method === 'GET') {
+        try {
+        const [rows] = await db.query('SELECT * FROM Items');
+
+        response.writeHead(200, { 
+            'Content-Type': 'application/json; charset=utf-8' 
+        });
+
+        response.end(JSON.stringify(rows));
+        } catch (e) {
+        response.writeHead(200, { 
+            'Content-Type': 'application/json; charset=utf-8' 
+        });
+        
+        response.end(JSON.stringify(null));
         }
     }
     else {
