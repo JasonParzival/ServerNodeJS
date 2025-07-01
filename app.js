@@ -8,12 +8,7 @@ http.createServer(async function(request,response){
     const query = parsedUrl.query;
     
     if (path === '/') {
-        response.writeHead(200, {
-            "Content-Type": "text/html; charset=utf-8"
-        });
-
-        response.end("<h1>Привет, Октагон!</h1>");
-        return;
+        return sendHTML(response, "<h1>Привет, Октагон!</h1>", 200);
     }
     else if (path === '/static') {
         const responsejson = {
@@ -21,11 +16,7 @@ http.createServer(async function(request,response){
             body: "Octagon NodeJS Test"
         };
 
-        response.writeHead(200, { 
-            'Content-Type': 'application/json; charset=utf-8' 
-        });
-        response.end(JSON.stringify(responsejson));
-        return;
+        return sendJSON(response, responsejson);
     }
     else if (path === '/dynamic'){
         const a = parseFloat(query.a);
@@ -145,14 +136,8 @@ http.createServer(async function(request,response){
         }
     }
     else {
-        response.writeHead(404, { 
-            'Content-Type': 'text/plain; charset=utf-8' 
-        });
-        response.end('Not Found');
-        return;
+        return sendHTML(response, "<h1>Статус 404</h1><br><h2>Not Found</h2><br><h2>Не найдено</h2>", 404);
     }
-    
-     
 }).listen(3000, "127.0.0.1",function(){
     console.log("Сервер начал прослушивание запросов на порту 3000");
 });
@@ -162,4 +147,12 @@ function sendJSON(res, obj) {
         'Content-Type': 'application/json; charset=utf-8' 
     });
     res.end(JSON.stringify(obj));
+}
+
+function sendHTML(res, obj, code) {
+    res.writeHead(code, {
+        "Content-Type": "text/html; charset=utf-8"
+    });
+
+    res.end(obj);
 }
