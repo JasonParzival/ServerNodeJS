@@ -1,6 +1,9 @@
 const http = require("http");
 const url = require('url');
 const db = require('./db');
+const tgbot = require('./tgbot');
+
+tgbot();
 
 http.createServer(async function(request,response){
     const parsedUrl = url.parse(request.url, true);
