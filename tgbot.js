@@ -9,6 +9,15 @@ function startBot() {
         bot.sendMessage(chatId, 'Привет, октагон!');
     });
 
+    bot.onText(/\/help/, (msg) => {
+        const chatId = msg.chat.id;
+        const helpText = `Доступные команды:
+/help — список команд и их описание
+/site — ссылка на сайт Октагона
+/creator — информация о Создателе бота`;
+        bot.sendMessage(chatId, helpText);
+    });
+
     console.log('Telegram bot started');
 }
 
