@@ -18,6 +18,16 @@ function startBot() {
         bot.sendMessage(chatId, helpText);
     });
 
+    bot.onText(/\/site/, (msg) => {
+        const chatId = msg.chat.id;
+        bot.sendMessage(chatId, 'https://octagon-students.ru');
+    });
+
+    bot.onText(/\/creator/, (msg) => {
+        const chatId = msg.chat.id;
+        bot.sendMessage(chatId, 'Мухамедзянов Руслан Ильгизарович'); 
+    });
+
     console.log('Telegram bot started');
 }
 
