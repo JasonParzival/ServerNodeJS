@@ -15,7 +15,10 @@ function startBot() {
         const helpText = `Доступные команды:
 /help — список команд и их описание
 /site — ссылка на сайт Октагона
-/creator — информация о Создателе бота`;
+/creator — информация о Создателе бота
+/randomItem — вывод случайного объекта
+/deleteItem (ID) — удаление объекта по айди
+/getItemById (ID) — нахождение обьекта по айди`;
         bot.sendMessage(chatId, helpText);
     });
 
@@ -45,41 +48,53 @@ function startBot() {
         }
     });
 
-    bot.onText(/\/deleteItem (\d+)/, async (msg, match) => {
+    bot.onText(/\/deleteItem(?: (\d+))?/, async (msg, match) => {
         const chatId = msg.chat.id;
-        const id = parseInt(match[1]);
-        try {
-            const [rows] = await db.query('SELECT * FROM ItemsNew WHERE id = ?', [id]);
+        const idStr = match[1];
+        const id = parseInt(idStr);
+        if (!idStr) {
+            bot.sendMessage(chatId, 'Ошибка: ID не указан или не является числом.');
+        }
+        else {
+            try {
+                const [rows] = await db.query('SELECT * FROM ItemsNew WHERE id = ?', [id]);
 
-            if (rows.length === 0) {
-                bot.sendMessage(chatId, 'Ошибка');
-            } else {
-                const item = rows[0];
+                if (rows.length === 0) {
+                    bot.sendMessage(chatId, 'Ошибка');
+                } else {
+                    const item = rows[0];
 
-                await db.query('DELETE FROM ItemsNew WHERE id = ?', [item.id]);
+                    await db.query('DELETE FROM ItemsNew WHERE id = ?', [item.id]);
 
-                bot.sendMessage(chatId, 'Удачно');
+                    bot.sendMessage(chatId, 'Удачно');
+                }
+            } catch (e) {
+                bot.sendMessage(chatId, 'Ошибка при получении предмета.');
             }
-        } catch (e) {
-            bot.sendMessage(chatId, 'Ошибка при получении предмета.');
         }
     });
 
-    bot.onText(/\/getItemById (\d+)/, async (msg, match) => {
+    bot.onText(/\/getItemById(?: (\d+))?/, async (msg, match) => {
         const chatId = msg.chat.id;
-        const id = parseInt(match[1]);
-        try {
-            const [rows] = await db.query('SELECT * FROM ItemsNew WHERE id = ?', [id]);
+        const idStr = match[1];
+        const id = parseInt(idStr);
+        if (!idStr) {
+            bot.sendMessage(chatId, 'Ошибка: ID не указан или не является числом.');
+        }
+        else {
+            try {
+                const [rows] = await db.query('SELECT * FROM ItemsNew WHERE id = ?', [id]);
 
-            if (rows.length === 0) {
-                bot.sendMessage(chatId, 'Такого объекта нет.');
-            } else {
-                const item = rows[0];
+                if (rows.length === 0) {
+                    bot.sendMessage(chatId, 'Такого объекта нет.');
+                } else {
+                    const item = rows[0];
 
-                bot.sendMessage(chatId, `(${item.id}) - ${item.name}: ${item.desc}`);
+                    bot.sendMessage(chatId, `(${item.id}) - ${item.name}: ${item.desc}`);
+                }
+            } catch (e) {
+                bot.sendMessage(chatId, 'Ошибка при получении предмета.');
             }
-        } catch (e) {
-            bot.sendMessage(chatId, 'Ошибка при получении предмета.');
         }
     });
 
