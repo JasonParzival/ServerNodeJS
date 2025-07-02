@@ -45,6 +45,26 @@ function startBot() {
         }
     });
 
+    bot.onText(/\/deleteItem (\d+)/, async (msg, match) => {
+        const chatId = msg.chat.id;
+        const id = parseInt(match[1]);
+        try {
+            const [rows] = await db.query('SELECT * FROM ItemsNew WHERE id = ?', [id]);
+
+            if (rows.length === 0) {
+                bot.sendMessage(chatId, 'Ошибка');
+            } else {
+                const item = rows[0];
+
+                await db.query('DELETE FROM ItemsNew WHERE id = ?', [item.id]);
+
+                bot.sendMessage(chatId, 'Удачно');
+            }
+        } catch (e) {
+            bot.sendMessage(chatId, 'Ошибка при получении предмета.');
+        }
+    });
+
     console.log('Telegram bot started');
 }
 
