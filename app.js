@@ -57,7 +57,7 @@ http.createServer(async function(request,response){
     }
     if (path === '/getAllItems' && request.method === 'GET') {
         try {
-            const [rows] = await db.query('SELECT * FROM Items');
+            const [rows] = await db.query('SELECT * FROM ItemsNew');
 
             return sendJSON(response, rows);
         } catch (e) {
@@ -73,11 +73,11 @@ http.createServer(async function(request,response){
         else {
             try {
                 const [result] = await db.query(
-                    'INSERT INTO Items (name, `desc`) VALUES (?, ?)', [name, desc]
+                    'INSERT INTO ItemsNew (name, `desc`) VALUES (?, ?)', [name, desc]
                 );
 
                 const [rows] = await db.query(
-                    'SELECT * FROM Items WHERE id = ?', [result.insertId]
+                    'SELECT * FROM ItemsNew WHERE id = ?', [result.insertId]
                 );
 
                 return sendJSON(response, rows[0] || {});
@@ -95,14 +95,14 @@ http.createServer(async function(request,response){
         else {
             try {
                 const [rows] = await db.query(
-                    'SELECT * FROM Items WHERE id = ?', [id]
+                    'SELECT * FROM ItemsNew WHERE id = ?', [id]
                 );
 
                 if (rows.length === 0) {
                     return sendJSON(response, {});
                 }
                 else {
-                    await db.query('DELETE FROM Items WHERE id = ?', [id]);
+                    await db.query('DELETE FROM ItemsNew WHERE id = ?', [id]);
                     return sendJSON(response, rows[0]);
                 }
             } catch (e) {
@@ -120,17 +120,17 @@ http.createServer(async function(request,response){
         }
         else {
             try {
-                const [rows] = await db.query('SELECT * FROM Items WHERE id = ?', [id]);
+                const [rows] = await db.query('SELECT * FROM ItemsNew WHERE id = ?', [id]);
 
                 if (rows.length === 0) {
                     return sendJSON(response, {});
                 }
                 else {
                     await db.query(
-                        'UPDATE Items SET name = ?, `desc` = ? WHERE id = ?', [name, desc, id]
+                        'UPDATE ItemsNew SET name = ?, `desc` = ? WHERE id = ?', [name, desc, id]
                     );
 
-                    const [updatedRows] = await db.query('SELECT * FROM Items WHERE id = ?', [id]);
+                    const [updatedRows] = await db.query('SELECT * FROM ItemsNew WHERE id = ?', [id]);
                     return sendJSON(response, updatedRows[0]);
                 }
             } catch (e) {
