@@ -65,6 +65,24 @@ function startBot() {
         }
     });
 
+    bot.onText(/\/getItemById (\d+)/, async (msg, match) => {
+        const chatId = msg.chat.id;
+        const id = parseInt(match[1]);
+        try {
+            const [rows] = await db.query('SELECT * FROM ItemsNew WHERE id = ?', [id]);
+
+            if (rows.length === 0) {
+                bot.sendMessage(chatId, 'Такого объекта нет.');
+            } else {
+                const item = rows[0];
+
+                bot.sendMessage(chatId, `(${item.id}) - ${item.name}: ${item.desc}`);
+            }
+        } catch (e) {
+            bot.sendMessage(chatId, 'Ошибка при получении предмета.');
+        }
+    });
+
     console.log('Telegram bot started');
 }
 
