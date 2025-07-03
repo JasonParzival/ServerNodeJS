@@ -1,5 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const QRcode = require('qrcode');
+const puppeteer = require('puppeteer');
+const fs = require('fs');
 const db = require('./db');
 
 function startBot() {
@@ -112,6 +114,44 @@ function startBot() {
             });
         } catch (e) {
             bot.sendMessage(chatId, 'Ошибка при генерации QR-кода.');
+        }
+    });
+
+    bot.onText(/!webscr (.+)/, async (msg, match) => {
+        const chatId = msg.chat.id;
+        const url = match[1];
+
+        if (!/^https?:\/\//.test(url)) {
+            bot.sendMessage(chatId, 'Пожалуйста, введите корректный URL с http://... или https://...');
+        }
+        else{
+            try {
+                const browser = await puppeteer.launch({
+                    args: ['--no-sandbox', '--disable-setuid-sandbox']
+                });
+
+                const page = await browser.newPage();
+
+                await page.setViewport({ width: 1280, height: 800 });
+
+                await page.goto(url, { 
+                    waitUntil: 'networkidle2', timeout: 30000 
+                });
+
+                const screenshot = await page.screenshot({ fullPage: false });
+
+                await browser.close();
+
+                await bot.sendPhoto(chatId, screenshot, {
+                    caption: 'Скриншот сайта' 
+                }, {
+                    filename: 'screenshot.png',
+                    contentType: 'image/png'
+                });
+            } catch (e) {
+                console.error('Ошибка при создании скриншота:', e);
+                bot.sendMessage(chatId, 'Ошибка при создании скриншота. Возможно, сайт недоступен.');
+            }
         }
     });
 
