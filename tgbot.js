@@ -156,6 +156,27 @@ function startBot() {
         }
     });
 
+    bot.on('message', async (msg) => {
+        const userId = msg.from.id;
+        const chatId = msg.chat.id;
+        const today = new Date().toISOString().slice(0, 10);
+
+        try {
+            const [rows] = await db.query('SELECT id FROM Users WHERE id = ?', [userId]);
+
+            if (rows.length === 0) {
+                await db.query('INSERT INTO Users (id, lastMessage) VALUES (?, ?)', [userId, today]);
+            } else {
+                await db.query('UPDATE Users SET lastMessage = ? WHERE id = ?', [today, userId]);
+            }
+            
+            bot.sendMessage(chatId, 'Вы прекрасны!');
+        } catch (e) {
+            console.error('Ошибка:', e);
+            bot.sendMessage(chatId, 'Ошибка при обращении к БД');
+        }
+    });
+
     console.log('Telegram bot started');
 }
 
