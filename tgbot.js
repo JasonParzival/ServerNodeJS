@@ -21,7 +21,9 @@ function startBot() {
 /creator — информация о Создателе бота
 /randomItem — вывод случайного объекта
 /deleteItem (ID) — удаление объекта по айди
-/getItemById (ID) — нахождение обьекта по айди`;
+/getItemById (ID) — нахождение обьекта по айди
+!qr (текст/ссылка) — создание QR-кода по тексту или сайту
+!webscr (ссылка) — создание скриншота сайта`;
         bot.sendMessage(chatId, helpText);
     });
 
@@ -149,7 +151,6 @@ function startBot() {
                     contentType: 'image/png'
                 });
             } catch (e) {
-                console.error('Ошибка при создании скриншота:', e);
                 bot.sendMessage(chatId, 'Ошибка при создании скриншота. Возможно, сайт недоступен.');
             }
         }
