@@ -1,4 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
+const QRcode = require('qrcode');
 const db = require('./db');
 
 function startBot() {
@@ -95,6 +96,22 @@ function startBot() {
             } catch (e) {
                 bot.sendMessage(chatId, 'Ошибка при получении предмета.');
             }
+        }
+    });
+
+    bot.onText(/!qr (.+)/, async (msg, match) => {
+        const chatId = msg.chat.id;
+        const text = match[1];
+
+        try {
+            const qrDataUrl = await QRcode.toBuffer(text);
+
+            bot.sendPhoto(chatId, qrDataUrl, { caption: 'Ваш QR-код' }, {
+                filename: 'qrcode.png',
+                contentType: 'image/png'
+            });
+        } catch (e) {
+            bot.sendMessage(chatId, 'Ошибка при генерации QR-кода.');
         }
     });
 
