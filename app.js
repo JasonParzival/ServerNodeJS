@@ -1,69 +1,40 @@
-const http = require("http");
-const url = require('url');
+const express = require('express');
+const app = express();
 
-http.createServer(function(request,response){
-    const parsedUrl = url.parse(request.url, true);
-    const path = parsedUrl.pathname;
-    const query = parsedUrl.query;
-    
-    if (path === '/') {
-        response.writeHead(200, {
-            "Content-Type": "text/html; charset=utf-8"
-        });
+app.get('/', (req, res) => {
+  res.send('<h1>Привет, Октагон!</h1>');
+});
 
-        response.end("<h1>Привет, Октагон!</h1>");
-    }
-    else if (path === '/static') {
-        const responsejson = {
-            header: "Hello",
-            body: "Octagon NodeJS Test"
-        };
+app.get('/static', (req, res) => {
+  res.json({
+    header: "Hello",
+    body: "Octagon NodeJS Test"
+  });
+});
 
-        response.writeHead(200, { 
-            'Content-Type': 'application/json; charset=utf-8' 
-        });
-        response.end(JSON.stringify(responsejson));
-    }
-    else if (path === '/dynamic'){
-        const a = parseFloat(query.a);
-        const b = parseFloat(query.b);
-        const c = parseFloat(query.c);
+app.get('/dynamic', (req, res) => {
+  const a = parseFloat(req.query.a);
+  const b = parseFloat(req.query.b);
+  const c = parseFloat(req.query.c);
 
-        if (
-            query.a === undefined || query.b === undefined || query.c === undefined ||
-            isNaN(a) || isNaN(b) || isNaN(c)
-        ) {
-            const errorResponse = { 
-                header: "Error" 
-            };
+  if (
+    req.query.a === undefined || req.query.b === undefined || req.query.c === undefined ||
+    isNaN(a) || isNaN(b) || isNaN(c)
+  ) {
+    res.status(404).json({ header: "Error" });
+  } else {
+    const result = (a * b * c) / 3;
+    res.json({
+      header: "Calculated",
+      body: result.toString()
+    });
+  }
+});
 
-            response.writeHead(404, { 
-                'Content-Type': 'application/json; charset=utf-8' 
-            });
+app.use((req, res) => {
+  res.status(404).send('Not Found');
+});
 
-            response.end(JSON.stringify(errorResponse));
-        } else {
-            const result = (a * b * c) / 3;
-
-            const successResponse = {
-                header: "Calculated",
-                body: result.toString()
-            };
-
-            response.writeHead(200, { 
-                'Content-Type': 'application/json; charset=utf-8' 
-            });
-            response.end(JSON.stringify(successResponse));
-        }
-    }
-    else {
-        response.writeHead(404, { 
-            'Content-Type': 'text/plain; charset=utf-8' 
-        });
-        response.end('Not Found');
-    }
-    
-     
-}).listen(3000, "127.0.0.1",function(){
+app.listen(3000, "127.0.0.1",function(){
     console.log("Сервер начал прослушивание запросов на порту 3000");
 });
